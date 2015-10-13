@@ -1,0 +1,49 @@
+### For Mapping Reads to the TAIR10 Reference Genome (TAIR10) with STAR aligner
+
+# Download TAIR10 reference genome (ensembl build)from Illumina's iGenomes site 
+# http://support.illumina.com/sequencing/sequencing_software/igenome.html
+# move into directory on working server directory. 
+# Feseha installed STAR aligner for me.
+
+#uncompress files
+tar -zxvf Arabidopsis_thaliana_Ensembl_TAIR10.tar.gz
+
+# within each sample folder, make a folder for star files
+	mkdir star_Cnst0_1 
+	
+# run STAR commands from my home directory on server
+
+	# Step 1: Generate reference genome
+		STAR --runMode genomeGenerate --genomeDir ~/at_RNAseq/TAIR10/star_at/ 
+			--genomeFastaFiles ~/at_RNAseq/TAIR10/Arabidopsis_thaliana/Ensembl/TAIR10/Sequence/WholeGenomeFasta/genome.fa 
+			--sjdbGTFfile ~/at_RNAseq/TAIR10/Arabidopsis_thaliana/Ensembl/TAIR10/Annotation/Genes/genes.gtf 
+			--sjdbOverhang 100 --runThreadN 10 --limitGenomeGenerateRAM 1000000000	
+	
+	# Step 2: Map reads to the reference
+		# need 1 pair style command for each of the trimmomatic output files 1P and 2P
+		STAR --outFilterMatchNminOverLread 0.40 --outStd Log --genomeDir ~/at_RNAseq/TAIR10/star_at/ \
+			--outFilterMismatchNmax 2 \
+			--readFilesIn ~/at_RNAseq/150330/Sample_Cnst0_Rep1/Trimmomatic_2Cnst0_1/2Cnst0_1_1P ~/at_RNAseq/150330/Sample_Cnst0_Rep1/Trimmomatic_2Cnst0_1/2Cnst0_1_2P \
+			--outFilterScoreMinOverLread 0.40 \
+			--runThreadN 10 \
+			--genomeLoad NoSharedMemory --outFilterIntronMotifs RemoveNoncanonical \
+			--outSAMtype BAM SortedByCoordinate --outFileNamePrefix 2Cnst0_1_P. --limitBAMsortRAM 100000000000
+		
+		# then 1 unpaired style command each for the U files 
+		STAR --outFilterMatchNminOverLread 0.40 --outStd Log --genomeDir ~/at_RNAseq/TAIR10/star_at/ \
+			--outFilterMismatchNmax 2 \
+			--readFilesIn ~/at_RNAseq/150330/Sample_Cnst0_Rep1/Trimmomatic_2Cnst0_1/2Cnst0_1_1U \
+			--outFilterScoreMinOverLread 0.40 \
+			--runThreadN 10 \
+			--genomeLoad NoSharedMemory --outFilterIntronMotifs RemoveNoncanonical \
+			--outSAMtype BAM SortedByCoordinate --outFileNamePrefix 2Cnst0_1_1U. --limitBAMsortRAM 100000000000
+		
+		STAR --outFilterMatchNminOverLread 0.40 --outStd Log --genomeDir ~/at_RNAseq/TAIR10/star_at/ \
+			--outFilterMismatchNmax 2 \
+			--readFilesIn ~/at_RNAseq/150330/Sample_Cnst0_Rep1/Trimmomatic_2Cnst0_1/2Cnst0_1_2U \
+			--outFilterScoreMinOverLread 0.40 \
+			--runThreadN 10 \
+			--genomeLoad NoSharedMemory --outFilterIntronMotifs RemoveNoncanonical \
+			--outSAMtype BAM SortedByCoordinate --outFileNamePrefix Cnst0_1_2U. --limitBAMsortRAM 100000000000
+			
+# repeat step 2 for each sample
