@@ -1,0 +1,613 @@
+#A simple BWA alignment against the mODC gene sequence to check if mODC was expressed
+
+
+## on server, type BWA to make sure the program is installed:
+#### good
+##### Program: bwa (alignment via Burrows-Wheeler transformation)
+##### Version: 0.7.9a-r786
+
+##move fasta file with mODC sequence onto server 
+scp -p -r -C -P 22 /Users/karasarver/RNAseq_Scripts/mODC.fasta name@serverAddress:~/at_RNAseq/150330
+
+##make the reference index file
+#### in at_RNAseq, make a new folder
+mkdir BWA_mODCs
+bwa index -p mODC_idx -a is mODC.fasta
+samtools mODCindx2 mODC.fasta
+
+#:~/at_RNAseq/BWA_mODC$ bwa index -p mODC_idx -a is mODC.fasta
+#[bwa_index] Pack FASTA... 0.00 sec
+#[bwa_index] Construct BWT for the packed sequence...
+#[bwa_index] 0.00 seconds elapse.
+#[bwa_index] Update BWT... 0.00 sec
+#[bwa_index] Pack forward-only FASTA... 0.00 sec
+#[bwa_index] Construct SA from BWT and Occ... 0.00 sec
+#[main] Version: 0.7.9a-r786
+#[main] CMD: bwa index -p mODC_idx -a is mODC.fasta
+#[main] Real time: 0.357 sec; CPU: 0.006 sec
+
+
+##do alignments!!
+
+
+##########################################Cnst0_1 
+mkdir BWA_Cnst0_1  #etc...
+#concatenate files in 
+cat ~/at_RNAseq/150116/Sample_Cnst0_Rep1/trimmomatic_Cnst0_1/Cnst0_1_1P  ~/at_RNAseq/150330/Sample_Cnst0_Rep1/Trimmomatic_2Cnst0_1/2Cnst0_1_1P >3Cnst0_1_1P
+cat ~/at_RNAseq/150116/Sample_Cnst0_Rep1/trimmomatic_Cnst0_1/Cnst0_1_2P  ~/at_RNAseq/150330/Sample_Cnst0_Rep1/Trimmomatic_2Cnst0_1/2Cnst0_1_2P >3Cnst0_1_2P
+cat ~/at_RNAseq/150116/Sample_Cnst0_Rep1/trimmomatic_Cnst0_1/Cnst0_1_1U  ~/at_RNAseq/150330/Sample_Cnst0_Rep1/Trimmomatic_2Cnst0_1/2Cnst0_1_1U >3Cnst0_1_1U
+cat ~/at_RNAseq/150116/Sample_Cnst0_Rep1/trimmomatic_Cnst0_1/Cnst0_1_2U  ~/at_RNAseq/150330/Sample_Cnst0_Rep1/Trimmomatic_2Cnst0_1/2Cnst0_1_2U >3Cnst0_1_2U
+
+#### Have to do all files separately... 
+bwa aln -t 4 ../mODC_idx 3Cnst0_1_1P >  Cnst0_1_1P.txt.bwa		#DONE
+bwa aln -t 4 ../mODC_idx 3Cnst0_1_2P >  Cnst0_1_2P.txt.bwa		#DONE
+bwa sampe ../mODC_idx Cnst0_1_1P.txt.bwa Cnst0_1_2P.txt.bwa 3Cnst0_1_1P 3Cnst0_1_2P > Cnst0_1_P.txt.sam
+bwa aln -t 4 ../mODC_idx 3Cnst0_1_1U >  Cnst0_1_1U.txt.bwa
+bwa samse ../mODC_idx Cnst0_1_1U.txt.bwa 3Cnst0_1_1U > Cnst0_1_1U.txt.sam
+bwa aln -t 4 ../mODC_idx 3Cnst0_1_2U >  Cnst0_1_2U.txt.bwa
+bwa samse ../mODC_idx Cnst0_1_2U.txt.bwa 3Cnst0_1_2U > Cnst0_1_2U.txt.sam
+rm *txt.bwa
+cd ..
+##########################################Cnst0_2
+mkdir BWA_Cnst0_2 
+cd BWA_Cnst0_2
+#concatenate files in the new folder
+cat ~/at_RNAseq/150116/Sample_Cnst0_Rep2/Trimmomatic_Cnst0_2/Cnst0_2_1P  ~/at_RNAseq/150330/Sample_Cnst0_Rep2/Trimmomatic_2Cnst0_2/2Cnst0_2_1P >3Cnst0_2_1P
+cat ~/at_RNAseq/150116/Sample_Cnst0_Rep2/Trimmomatic_Cnst0_2/Cnst0_2_2P  ~/at_RNAseq/150330/Sample_Cnst0_Rep2/Trimmomatic_2Cnst0_2/2Cnst0_2_2P >3Cnst0_2_2P
+cat ~/at_RNAseq/150116/Sample_Cnst0_Rep2/Trimmomatic_Cnst0_2/Cnst0_2_1U  ~/at_RNAseq/150330/Sample_Cnst0_Rep2/Trimmomatic_2Cnst0_2/2Cnst0_2_1U >3Cnst0_2_1U
+cat ~/at_RNAseq/150116/Sample_Cnst0_Rep2/Trimmomatic_Cnst0_2/Cnst0_2_2U  ~/at_RNAseq/150330/Sample_Cnst0_Rep2/Trimmomatic_2Cnst0_2/2Cnst0_2_2U >3Cnst0_2_2U
+
+#### Have to do align files separately... 
+bwa aln -t 4 ../mODC_idx 3Cnst0_2_1P >  Cnst0_2_1P.txt.bwa
+bwa aln -t 4 ../mODC_idx 3Cnst0_2_2P >  Cnst0_2_2P.txt.bwa
+bwa sampe ../mODC_idx Cnst0_2_1P.txt.bwa Cnst0_2_2P.txt.bwa 3Cnst0_2_1P 3Cnst0_2_2P > Cnst0_2_P.txt.sam
+bwa aln -t 4 ../mODC_idx 3Cnst0_2_1U >  Cnst0_2_1U.txt.bwa
+bwa samse ../mODC_idx Cnst0_2_1U.txt.bwa 3Cnst0_2_1U > Cnst0_2_1U.txt.sam
+bwa aln -t 4 ../mODC_idx 3Cnst0_2_2U >  Cnst0_2_2U.txt.bwa
+bwa samse ../mODC_idx Cnst0_2_2U.txt.bwa 3Cnst0_2_2U > Cnst0_2_2U.txt.sam
+rm *txt.bwa
+cd ..
+##########################################Cnst0_3
+mkdir BWA_Cnst0_3  
+cd BWA_Cnst0_3
+#concatenate files in the new folder
+cat ~/at_RNAseq/150116/Sample_Cnst0_Rep3/Trimmomatic_Cnst0_3/Cnst0_3_1P  ~/at_RNAseq/150330/Sample_Cnst0_Rep3/Trimmomatic_2Cnst0_3/2Cnst0_3_1P >3Cnst0_3_1P
+cat ~/at_RNAseq/150116/Sample_Cnst0_Rep3/Trimmomatic_Cnst0_3/Cnst0_3_2P  ~/at_RNAseq/150330/Sample_Cnst0_Rep3/Trimmomatic_2Cnst0_3/2Cnst0_3_2P >3Cnst0_3_2P
+cat ~/at_RNAseq/150116/Sample_Cnst0_Rep3/Trimmomatic_Cnst0_3/Cnst0_3_1U  ~/at_RNAseq/150330/Sample_Cnst0_Rep3/Trimmomatic_2Cnst0_3/2Cnst0_3_1U >3Cnst0_3_1U
+cat ~/at_RNAseq/150116/Sample_Cnst0_Rep3/Trimmomatic_Cnst0_3/Cnst0_3_2U  ~/at_RNAseq/150330/Sample_Cnst0_Rep3/Trimmomatic_2Cnst0_3/2Cnst0_3_2U >3Cnst0_3_2U
+
+#### Have to do all files separately... 
+bwa aln -t 4 ../mODC_idx 3Cnst0_3_1P >  Cnst0_3_1P.txt.bwa
+bwa aln -t 4 ../mODC_idx 3Cnst0_3_2P >  Cnst0_3_2P.txt.bwa
+bwa sampe ../mODC_idx Cnst0_3_1P.txt.bwa Cnst0_3_2P.txt.bwa 3Cnst0_3_1P 3Cnst0_3_2P > Cnst0_3_P.txt.sam
+bwa aln -t 4 ../mODC_idx 3Cnst0_3_1U >  Cnst0_3_1U.txt.bwa
+bwa samse ../mODC_idx Cnst0_3_1U.txt.bwa 3Cnst0_3_1U >Cnst0_3_1U.txt.sam
+bwa aln -t 4 ../mODC_idx 3Cnst0_3_2U >  Cnst0_3_2U.txt.bwa
+bwa samse ../mODC_idx Cnst0_3_2U.txt.bwa 3Cnst0_3_2U > Cnst0_3_2U.txt.sam
+rm *txt.bwa
+cd ..
+##########################################Cnst24_1
+mkdir BWA_Cnst24_1  
+cd BWA_Cnst24_1
+#concatenate files in the new folder
+cat ~/at_RNAseq/150116/Sample_Cnst24_Rep1/trimmomatic_Cnst24_1/Cnst24_1_1P  ~/at_RNAseq/150330/Sample_Cnst24_Rep1/Trimmomatic_2Cnst24_1/2Cnst24_1_1P >3Cnst24_1_1P
+cat ~/at_RNAseq/150116/Sample_Cnst24_Rep1/trimmomatic_Cnst24_1/Cnst24_1_2P  ~/at_RNAseq/150330/Sample_Cnst24_Rep1/Trimmomatic_2Cnst24_1/2Cnst24_1_2P >3Cnst24_1_2P
+cat ~/at_RNAseq/150116/Sample_Cnst24_Rep1/trimmomatic_Cnst24_1/Cnst24_1_1U  ~/at_RNAseq/150330/Sample_Cnst24_Rep1/Trimmomatic_2Cnst24_1/2Cnst24_1_1U >3Cnst24_1_1U
+cat ~/at_RNAseq/150116/Sample_Cnst24_Rep1/trimmomatic_Cnst24_1/Cnst24_1_2U  ~/at_RNAseq/150330/Sample_Cnst24_Rep1/Trimmomatic_2Cnst24_1/2Cnst24_1_2U >3Cnst24_1_2U
+
+#### Have to do all files separately... 
+bwa aln -t 4 ../mODC_idx 3Cnst24_1_1P >  Cnst24_1_1P.txt.bwa
+bwa aln -t 4 ../mODC_idx 3Cnst24_1_2P >  Cnst24_1_2P.txt.bwa
+bwa sampe ../mODC_idx Cnst24_1_1P.txt.bwa Cnst24_1_2P.txt.bwa 3Cnst24_1_1P 3Cnst24_1_2P > Cnst24_1_P.txt.sam
+bwa aln -t 4 ../mODC_idx 3Cnst24_1_1U >  Cnst24_1_1U.txt.bwa
+bwa samse ../mODC_idx Cnst24_1_1U.txt.bwa 3Cnst24_1_1U >Cnst24_1_1U.txt.sam
+bwa aln -t 4 ../mODC_idx 3Cnst24_1_2U >  Cnst24_1_2U.txt.bwa
+bwa samse ../mODC_idx Cnst24_1_2U.txt.bwa 3Cnst24_1_2U > Cnst24_1_2U.txt.sam
+rm *txt.bwa
+cd ..
+##########################################Cnst24_2
+mkdir BWA_Cnst24_2  
+cd BWA_Cnst24_2
+#concatenate files in the new folder
+cat ~/at_RNAseq/150116/Sample_Cnst24_Rep2/trimmomatic_Cnst24_2/Cnst24_2_1P  ~/at_RNAseq/150330/Sample_Cnst24_Rep2/Trimmomatic_2Cnst24_2/2Cnst24_2_1P >3Cnst24_2_1P
+cat ~/at_RNAseq/150116/Sample_Cnst24_Rep2/trimmomatic_Cnst24_2/Cnst24_2_2P  ~/at_RNAseq/150330/Sample_Cnst24_Rep2/Trimmomatic_2Cnst24_2/2Cnst24_2_2P >3Cnst24_2_2P
+cat ~/at_RNAseq/150116/Sample_Cnst24_Rep2/trimmomatic_Cnst24_2/Cnst24_2_1U  ~/at_RNAseq/150330/Sample_Cnst24_Rep2/Trimmomatic_2Cnst24_2/2Cnst24_2_1U >3Cnst24_2_1U
+cat ~/at_RNAseq/150116/Sample_Cnst24_Rep2/trimmomatic_Cnst24_2/Cnst24_2_2U  ~/at_RNAseq/150330/Sample_Cnst24_Rep2/Trimmomatic_2Cnst24_2/2Cnst24_2_2U >3Cnst24_2_2U
+
+#### Have to do all files separately... 
+bwa aln -t 4 ../mODC_idx 3Cnst24_2_1P >  Cnst24_2_1P.txt.bwa
+bwa aln -t 4 ../mODC_idx 3Cnst24_2_2P >  Cnst24_2_2P.txt.bwa
+bwa sampe ../mODC_idx Cnst24_2_1P.txt.bwa Cnst24_2_2P.txt.bwa 3Cnst24_2_1P 3Cnst24_2_2P > Cnst24_2_P.txt.sam
+bwa aln -t 4 ../mODC_idx 3Cnst24_2_1U >  Cnst24_2_1U.txt.bwa
+bwa samse ../mODC_idx Cnst24_2_1U.txt.bwa 3Cnst24_2_1U >Cnst24_2_1U.txt.sam
+bwa aln -t 4 ../mODC_idx 3Cnst24_2_2U >  Cnst24_2_2U.txt.bwa
+bwa samse ../mODC_idx Cnst24_2_2U.txt.bwa 3Cnst24_2_2U > Cnst24_2_2U.txt.sam
+rm *txt.bwa
+cd ..
+##########################################Cnst24_3
+mkdir BWA_Cnst24_3  
+cd BWA_Cnst24_3
+#concatenate files in the new folder
+cat ~/at_RNAseq/150116/Sample_Cnst24_Rep3/trimmomatic_Cnst24_3/Cnst24_3_1P  ~/at_RNAseq/150330/Sample_Cnst24_Rep3/Trimmomatic_2Cnst24_3/2Cnst24_3_1P >3Cnst24_3_1P
+cat ~/at_RNAseq/150116/Sample_Cnst24_Rep3/trimmomatic_Cnst24_3/Cnst24_3_2P  ~/at_RNAseq/150330/Sample_Cnst24_Rep3/Trimmomatic_2Cnst24_3/2Cnst24_3_2P >3Cnst24_3_2P
+cat ~/at_RNAseq/150116/Sample_Cnst24_Rep3/trimmomatic_Cnst24_3/Cnst24_3_1U  ~/at_RNAseq/150330/Sample_Cnst24_Rep3/Trimmomatic_2Cnst24_3/2Cnst24_3_1U >3Cnst24_3_1U
+cat ~/at_RNAseq/150116/Sample_Cnst24_Rep3/trimmomatic_Cnst24_3/Cnst24_3_2U  ~/at_RNAseq/150330/Sample_Cnst24_Rep3/Trimmomatic_2Cnst24_3/2Cnst24_3_2U >3Cnst24_3_2U
+
+#### Have to do all files separately... 
+bwa aln -t 4 ../mODC_idx 3Cnst24_3_1P >  Cnst24_3_1P.txt.bwa
+bwa aln -t 4 ../mODC_idx 3Cnst24_3_2P >  Cnst24_3_2P.txt.bwa
+bwa sampe ../mODC_idx Cnst24_3_1P.txt.bwa Cnst24_3_2P.txt.bwa 3Cnst24_3_1P 3Cnst24_3_2P > Cnst24_3_P.txt.sam
+bwa aln -t 4 ../mODC_idx 3Cnst24_3_1U >  Cnst24_3_1U.txt.bwa
+bwa samse ../mODC_idx Cnst24_3_1U.txt.bwa 3Cnst24_3_1U >Cnst24_3_1U.txt.sam
+bwa aln -t 4 ../mODC_idx 3Cnst24_3_2U >  Cnst24_3_2U.txt.bwa
+bwa samse ../mODC_idx Cnst24_3_2U.txt.bwa 3Cnst24_3_2U > Cnst24_3_2U.txt.sam
+rm *txt.bwa
+cd ..
+##########################################Ind0_1
+mkdir BWA_Ind0_1  
+cd BWA_Ind0_1
+#concatenate files in the new folder
+cat ~/at_RNAseq/150116/Sample_Ind0_Rep1/trimmomatic_Ind0_1/Ind0_1_1P  ~/at_RNAseq/150330/Sample_Ind0_Rep1/Trimmomatic_2Ind0_1/2Ind0_1_1P >3Ind0_1_1P
+cat ~/at_RNAseq/150116/Sample_Ind0_Rep1/trimmomatic_Ind0_1/Ind0_1_2P  ~/at_RNAseq/150330/Sample_Ind0_Rep1/Trimmomatic_2Ind0_1/2Ind0_1_2P >3Ind0_1_2P
+cat ~/at_RNAseq/150116/Sample_Ind0_Rep1/trimmomatic_Ind0_1/Ind0_1_1U  ~/at_RNAseq/150330/Sample_Ind0_Rep1/Trimmomatic_2Ind0_1/2Ind0_1_1U >3Ind0_1_1U
+cat ~/at_RNAseq/150116/Sample_Ind0_Rep1/trimmomatic_Ind0_1/Ind0_1_2U  ~/at_RNAseq/150330/Sample_Ind0_Rep1/Trimmomatic_2Ind0_1/2Ind0_1_2U >3Ind0_1_2U
+
+#### Have to do all files separately... 
+bwa aln -t 4 ../mODC_idx 3Ind0_1_1P >  Ind0_1_1P.txt.bwa
+bwa aln -t 4 ../mODC_idx 3Ind0_1_2P >  Ind0_1_2P.txt.bwa
+bwa sampe ../mODC_idx Ind0_1_1P.txt.bwa Ind0_1_2P.txt.bwa 3Ind0_1_1P 3Ind0_1_2P > Ind0_1_P.txt.sam
+bwa aln -t 4 ../mODC_idx 3Ind0_1_1U >  Ind0_1_1U.txt.bwa
+bwa samse ../mODC_idx Ind0_1_1U.txt.bwa 3Ind0_1_1U >Ind0_1_1U.txt.sam
+bwa aln -t 4 ../mODC_idx 3Ind0_1_2U >  Ind0_1_2U.txt.bwa
+bwa samse ../mODC_idx Ind0_1_2U.txt.bwa 3Ind0_1_2U > Ind0_1_2U.txt.sam
+rm *txt.bwa
+cd ..
+##########################################Ind0_2
+mkdir BWA_Ind0_2  
+cd BWA_Ind0_2
+#concatenate files in the new folder
+cat ~/at_RNAseq/150116/Sample_Ind0_Rep2/trimmomatic_Ind0_2/Ind0_2_1P  ~/at_RNAseq/150330/Sample_Ind0_Rep2/Trimmomatic_2Ind0_2/2Ind0_2_1P >3Ind0_2_1P
+cat ~/at_RNAseq/150116/Sample_Ind0_Rep2/trimmomatic_Ind0_2/Ind0_2_2P  ~/at_RNAseq/150330/Sample_Ind0_Rep2/Trimmomatic_2Ind0_2/2Ind0_2_2P >3Ind0_2_2P
+cat ~/at_RNAseq/150116/Sample_Ind0_Rep2/trimmomatic_Ind0_2/Ind0_2_1U  ~/at_RNAseq/150330/Sample_Ind0_Rep2/Trimmomatic_2Ind0_2/2Ind0_2_1U >3Ind0_2_1U
+cat ~/at_RNAseq/150116/Sample_Ind0_Rep2/trimmomatic_Ind0_2/Ind0_2_2U  ~/at_RNAseq/150330/Sample_Ind0_Rep2/Trimmomatic_2Ind0_2/2Ind0_2_2U >3Ind0_2_2U
+
+#### Have to do all files separately... 
+bwa aln -t 4 ../mODC_idx 3Ind0_2_1P >  Ind0_2_1P.txt.bwa
+bwa aln -t 4 ../mODC_idx 3Ind0_2_2P >  Ind0_2_2P.txt.bwa
+bwa sampe ../mODC_idx Ind0_2_1P.txt.bwa Ind0_2_2P.txt.bwa 3Ind0_2_1P 3Ind0_2_2P > Ind0_2_P.txt.sam
+bwa aln -t 4 ../mODC_idx 3Ind0_2_1U >  Ind0_2_1U.txt.bwa
+bwa samse ../mODC_idx Ind0_2_1U.txt.bwa 3Ind0_2_1U > Ind0_2_1U.txt.sam
+bwa aln -t 4 ../mODC_idx 3Ind0_2_2U >  Ind0_2_2U.txt.bwa
+bwa samse ../mODC_idx Ind0_2_2U.txt.bwa 3Ind0_2_2U > Ind0_2_2U.txt.sam
+rm *txt.bwa
+cd ..
+##########################################Ind0_3
+mkdir BWA_Ind0_3  
+cd BWA_Ind0_3
+#concatenate files in the new folder
+cat ~/at_RNAseq/150116/Sample_Ind0_Rep3/trimmomatic_Ind0_3/Ind0_3_1P  ~/at_RNAseq/150330/Sample_Ind0_Rep3/Trimmomatic_2Ind0_3/2Ind0_3_1P >3Ind0_3_1P
+cat ~/at_RNAseq/150116/Sample_Ind0_Rep3/trimmomatic_Ind0_3/Ind0_3_2P  ~/at_RNAseq/150330/Sample_Ind0_Rep3/Trimmomatic_2Ind0_3/2Ind0_3_2P >3Ind0_3_2P
+cat ~/at_RNAseq/150116/Sample_Ind0_Rep3/trimmomatic_Ind0_3/Ind0_3_1U  ~/at_RNAseq/150330/Sample_Ind0_Rep3/Trimmomatic_2Ind0_3/2Ind0_3_1U >3Ind0_3_1U
+cat ~/at_RNAseq/150116/Sample_Ind0_Rep3/trimmomatic_Ind0_3/Ind0_3_2U  ~/at_RNAseq/150330/Sample_Ind0_Rep3/Trimmomatic_2Ind0_3/2Ind0_3_2U >3Ind0_3_2U
+
+#### Have to do all files separately... 
+bwa aln -t 4 ../mODC_idx 3Ind0_3_1P >  Ind0_3_1P.txt.bwa
+bwa aln -t 4 ../mODC_idx 3Ind0_3_2P >  Ind0_3_2P.txt.bwa
+bwa sampe ../mODC_idx Ind0_3_1P.txt.bwa Ind0_3_2P.txt.bwa 3Ind0_3_1P 3Ind0_3_2P > Ind0_3_P.txt.sam
+bwa aln -t 4 ../mODC_idx 3Ind0_3_1U >  Ind0_3_1U.txt.bwa
+bwa samse ../mODC_idx Ind0_3_1U.txt.bwa 3Ind0_3_1U > Ind0_3_1U.txt.sam
+bwa aln -t 4 ../mODC_idx 3Ind0_3_2U >  Ind0_3_2U.txt.bwa
+bwa samse ../mODC_idx Ind0_3_2U.txt.bwa 3Ind0_3_2U > Ind0_3_2U.txt.sam
+rm *txt.bwa
+cd ..
+##########################################Indi24_1
+mkdir BWA_Indi24_1  
+cd BWA_Indi24_1
+#concatenate files in the new folder
+cat ~/at_RNAseq/150116/Sample_Indi24_Rep1/trimmomatic_Indi24_1/Indi24_1_1P  ~/at_RNAseq/150330/Sample_Indi24_Rep1/Trimmomatic_2Indi24_1/2Indi24_1_1P >3Indi24_1_1P
+cat ~/at_RNAseq/150116/Sample_Indi24_Rep1/trimmomatic_Indi24_1/Indi24_1_2P  ~/at_RNAseq/150330/Sample_Indi24_Rep1/Trimmomatic_2Indi24_1/2Indi24_1_2P >3Indi24_1_2P
+cat ~/at_RNAseq/150116/Sample_Indi24_Rep1/trimmomatic_Indi24_1/Indi24_1_1U  ~/at_RNAseq/150330/Sample_Indi24_Rep1/Trimmomatic_2Indi24_1/2Indi24_1_1U >3Indi24_1_1U
+cat ~/at_RNAseq/150116/Sample_Indi24_Rep1/trimmomatic_Indi24_1/Indi24_1_2U  ~/at_RNAseq/150330/Sample_Indi24_Rep1/Trimmomatic_2Indi24_1/2Indi24_1_2U >3Indi24_1_2U
+
+#### Have to do all files separately... 
+bwa aln -t 4 ../mODC_idx 3Indi24_1_1P >  Indi24_1_1P.txt.bwa
+bwa aln -t 4 ../mODC_idx 3Indi24_1_2P >  Indi24_1_2P.txt.bwa
+bwa sampe ../mODC_idx Indi24_1_1P.txt.bwa Indi24_1_2P.txt.bwa 3Indi24_1_1P 3Indi24_1_2P > Indi24_1_P.txt.sam
+bwa aln -t 4 ../mODC_idx 3Indi24_1_1U >  Indi24_1_1U.txt.bwa
+bwa samse ../mODC_idx Indi24_1_1U.txt.bwa 3Indi24_1_1U > Indi24_1_1U.txt.sam
+bwa aln -t 4 ../mODC_idx 3Indi24_1_2U >  Indi24_1_2U.txt.bwa
+bwa samse ../mODC_idx Indi24_1_2U.txt.bwa 3Indi24_1_2U > Indi24_1_2U.txt.sam
+rm *txt.bwa
+cd ..
+##########################################Indi24_2
+mkdir BWA_Indi24_2  
+cd BWA_Indi24_2
+#concatenate files in the new folder
+cat ~/at_RNAseq/150116/Sample_Indi24_Rep2/trimmomatic_Indi24_2/Indi24_2_1P  ~/at_RNAseq/150330/Sample_Indi24_Rep2/Trimmomatic_2Indi24_2/2Indi24_2_1P >3Indi24_2_1P
+cat ~/at_RNAseq/150116/Sample_Indi24_Rep2/trimmomatic_Indi24_2/Indi24_2_2P  ~/at_RNAseq/150330/Sample_Indi24_Rep2/Trimmomatic_2Indi24_2/2Indi24_2_2P >3Indi24_2_2P
+cat ~/at_RNAseq/150116/Sample_Indi24_Rep2/trimmomatic_Indi24_2/Indi24_2_1U  ~/at_RNAseq/150330/Sample_Indi24_Rep2/Trimmomatic_2Indi24_2/2Indi24_2_1U >3Indi24_2_1U
+cat ~/at_RNAseq/150116/Sample_Indi24_Rep2/trimmomatic_Indi24_2/Indi24_2_2U  ~/at_RNAseq/150330/Sample_Indi24_Rep2/Trimmomatic_2Indi24_2/2Indi24_2_2U >3Indi24_2_2U
+
+#### Have to do all files separately... 
+bwa aln -t 4 ../mODC_idx 3Indi24_2_1P >  Indi24_2_1P.txt.bwa
+bwa aln -t 4 ../mODC_idx 3Indi24_2_2P >  Indi24_2_2P.txt.bwa
+bwa sampe ../mODC_idx Indi24_2_1P.txt.bwa Indi24_2_2P.txt.bwa 3Indi24_2_1P 3Indi24_2_2P > Indi24_2_P.txt.sam
+bwa aln -t 4 ../mODC_idx 3Indi24_2_1U >  Indi24_2_1U.txt.bwa
+bwa samse ../mODC_idx Indi24_2_1U.txt.bwa 3Indi24_2_1U > Indi24_2_1U.txt.sam
+bwa aln -t 4 ../mODC_idx 3Indi24_2_2U >  Indi24_2_2U.txt.bwa
+bwa samse ../mODC_idx Indi24_2_2U.txt.bwa 3Indi24_2_2U > Indi24_2_2U.txt.sam
+rm *txt.bwa
+cd ..
+##########################################Indi24_3
+mkdir BWA_Indi24_3  
+cd BWA_Indi24_3
+#concatenate files in the new folder
+cat ~/at_RNAseq/150116/Sample_Indi24_Rep3/trimmomatic_Indi24_3/Indi24_3_1P  ~/at_RNAseq/150330/Sample_Indi24_Rep3/Trimmomatic_2Indi24_3/2Indi24_3_1P >3Indi24_3_1P
+cat ~/at_RNAseq/150116/Sample_Indi24_Rep3/trimmomatic_Indi24_3/Indi24_3_2P  ~/at_RNAseq/150330/Sample_Indi24_Rep3/Trimmomatic_2Indi24_3/2Indi24_3_2P >3Indi24_3_2P
+cat ~/at_RNAseq/150116/Sample_Indi24_Rep3/trimmomatic_Indi24_3/Indi24_3_1U  ~/at_RNAseq/150330/Sample_Indi24_Rep3/Trimmomatic_2Indi24_3/2Indi24_3_1U >3Indi24_3_1U
+cat ~/at_RNAseq/150116/Sample_Indi24_Rep3/trimmomatic_Indi24_3/Indi24_3_2U  ~/at_RNAseq/150330/Sample_Indi24_Rep3/Trimmomatic_2Indi24_3/2Indi24_3_2U >3Indi24_3_2U
+
+#### Have to do all files separately... 
+bwa aln -t 4 ../mODC_idx 3Indi24_3_1P >  Indi24_3_1P.txt.bwa
+bwa aln -t 4 ../mODC_idx 3Indi24_3_2P >  Indi24_3_2P.txt.bwa
+bwa sampe ../mODC_idx Indi24_3_1P.txt.bwa Indi24_3_2P.txt.bwa 3Indi24_3_1P 3Indi24_3_2P > Indi24_3_P.txt.sam
+bwa aln -t 4 ../mODC_idx 3Indi24_3_1U >  Indi24_3_1U.txt.bwa
+bwa samse ../mODC_idx Indi24_3_1U.txt.bwa 3Indi24_3_1U > Indi24_3_1U.txt.sam
+bwa aln -t 4 ../mODC_idx 3Indi24_3_2U >  Indi24_3_2U.txt.bwa
+bwa samse ../mODC_idx Indi24_3_2U.txt.bwa 3Indi24_3_2U > Indi24_3_2U.txt.sam
+rm *txt.bwa
+cd ..
+##########################################Indi48_1
+mkdir BWA_Indi48_1  
+cd BWA_Indi48_1
+#concatenate files in the new folder
+cat ~/at_RNAseq/150116/Sample_Indi48_Rep1/trimmomatic_Indi48_1/Indi48_1_1P  ~/at_RNAseq/150330/Sample_Indi48_Rep1/Trimmomatic_2Indi48_1/2Indi48_1_1P >3Indi48_1_1P
+cat ~/at_RNAseq/150116/Sample_Indi48_Rep1/trimmomatic_Indi48_1/Indi48_1_2P  ~/at_RNAseq/150330/Sample_Indi48_Rep1/Trimmomatic_2Indi48_1/2Indi48_1_2P >3Indi48_1_2P
+cat ~/at_RNAseq/150116/Sample_Indi48_Rep1/trimmomatic_Indi48_1/Indi48_1_1U  ~/at_RNAseq/150330/Sample_Indi48_Rep1/Trimmomatic_2Indi48_1/2Indi48_1_1U >3Indi48_1_1U
+cat ~/at_RNAseq/150116/Sample_Indi48_Rep1/trimmomatic_Indi48_1/Indi48_1_2U  ~/at_RNAseq/150330/Sample_Indi48_Rep1/Trimmomatic_2Indi48_1/2Indi48_1_2U >3Indi48_1_2U
+
+#### Have to do all files separately... 
+bwa aln -t 4 ../mODC_idx 3Indi48_1_1P >  Indi48_1_1P.txt.bwa
+bwa aln -t 4 ../mODC_idx 3Indi48_1_2P >  Indi48_1_2P.txt.bwa
+bwa sampe ../mODC_idx Indi48_1_1P.txt.bwa Indi48_1_2P.txt.bwa 3Indi48_1_1P 3Indi48_1_2P > Indi48_1_P.txt.sam
+bwa aln -t 4 ../mODC_idx 3Indi48_1_1U >  Indi48_1_1U.txt.bwa
+bwa samse ../mODC_idx Indi48_1_1U.txt.bwa 3Indi48_1_1U > Indi48_1_1U.txt.sam
+bwa aln -t 4 ../mODC_idx 3Indi48_1_2U >  Indi48_1_2U.txt.bwa
+bwa samse ../mODC_idx Indi48_1_2U.txt.bwa 3Indi48_1_2U > Indi48_1_2U.txt.sam
+rm *txt.bwa
+cd ..
+##########################################Indi48_2
+mkdir BWA_Indi48_2  
+cd BWA_Indi48_2
+#concatenate files in the new folder
+cat ~/at_RNAseq/150116/Sample_Indi48_Rep2/trimmomatic_Indi48_2/Indi48_2_1P  ~/at_RNAseq/150330/Sample_Indi48_Rep2/Trimmomatic_2Indi48_2/2Indi48_2_1P >3Indi48_2_1P
+cat ~/at_RNAseq/150116/Sample_Indi48_Rep2/trimmomatic_Indi48_2/Indi48_2_2P  ~/at_RNAseq/150330/Sample_Indi48_Rep2/Trimmomatic_2Indi48_2/2Indi48_2_2P >3Indi48_2_2P
+cat ~/at_RNAseq/150116/Sample_Indi48_Rep2/trimmomatic_Indi48_2/Indi48_2_1U  ~/at_RNAseq/150330/Sample_Indi48_Rep2/Trimmomatic_2Indi48_2/2Indi48_2_1U >3Indi48_2_1U
+cat ~/at_RNAseq/150116/Sample_Indi48_Rep2/trimmomatic_Indi48_2/Indi48_2_2U  ~/at_RNAseq/150330/Sample_Indi48_Rep2/Trimmomatic_2Indi48_2/2Indi48_2_2U >3Indi48_2_2U
+
+#### Have to do all files separately... 
+bwa aln -t 4 ../mODC_idx 3Indi48_2_1P >  Indi48_2_1P.txt.bwa
+bwa aln -t 4 ../mODC_idx 3Indi48_2_2P >  Indi48_2_2P.txt.bwa
+bwa sampe ../mODC_idx Indi48_2_1P.txt.bwa Indi48_2_2P.txt.bwa 3Indi48_2_1P 3Indi48_2_2P > Indi48_2_P.txt.sam
+bwa aln -t 4 ../mODC_idx 3Indi48_2_1U >  Indi48_2_1U.txt.bwa
+bwa samse ../mODC_idx Indi48_2_1U.txt.bwa 3Indi48_2_1U > Indi48_2_1U.txt.sam
+bwa aln -t 4 ../mODC_idx 3Indi48_2_2U >  Indi48_2_2U.txt.bwa
+bwa samse ../mODC_idx Indi48_2_2U.txt.bwa 3Indi48_2_2U > Indi48_2_2U.txt.sam
+rm *txt.bwa
+cd ..
+##########################################Indi48_3
+mkdir BWA_Indi48_3  
+cd BWA_Indi48_3
+#concatenate files in the new folder
+cat ~/at_RNAseq/150116/Sample_Indi48_Rep3/trimmomatic_Indi48_3/Indi48_3_1P  ~/at_RNAseq/150330/Sample_Indi48_Rep3/Trimmomatic_2Indi48_3/2Indi48_3_1P >3Indi48_3_1P
+cat ~/at_RNAseq/150116/Sample_Indi48_Rep3/trimmomatic_Indi48_3/Indi48_3_2P  ~/at_RNAseq/150330/Sample_Indi48_Rep3/Trimmomatic_2Indi48_3/2Indi48_3_2P >3Indi48_3_2P
+cat ~/at_RNAseq/150116/Sample_Indi48_Rep3/trimmomatic_Indi48_3/Indi48_3_1U  ~/at_RNAseq/150330/Sample_Indi48_Rep3/Trimmomatic_2Indi48_3/2Indi48_3_1U >3Indi48_3_1U
+cat ~/at_RNAseq/150116/Sample_Indi48_Rep3/trimmomatic_Indi48_3/Indi48_3_2U  ~/at_RNAseq/150330/Sample_Indi48_Rep3/Trimmomatic_2Indi48_3/2Indi48_3_2U >3Indi48_3_2U
+
+#### Have to do all files separately... 
+bwa aln -t 4 ../mODC_idx 3Indi48_3_1P >  Indi48_3_1P.txt.bwa
+bwa aln -t 4 ../mODC_idx 3Indi48_3_2P >  Indi48_3_2P.txt.bwa
+bwa sampe ../mODC_idx Indi48_3_1P.txt.bwa Indi48_3_2P.txt.bwa 3Indi48_3_1P 3Indi48_3_2P > Indi48_3_P.txt.sam
+bwa aln -t 4 ../mODC_idx 3Indi48_3_1U >  Indi48_3_1U.txt.bwa
+bwa samse ../mODC_idx Indi48_3_1U.txt.bwa 3Indi48_3_1U > Indi48_3_1U.txt.sam
+bwa aln -t 4 ../mODC_idx 3Indi48_3_2U >  Indi48_3_2U.txt.bwa
+bwa samse ../mODC_idx Indi48_3_2U.txt.bwa 3Indi48_3_2U > Indi48_3_2U.txt.sam
+rm *txt.bwa
+cd ..
+##########################################Indn24_1
+mkdir BWA_Indn24_1  
+cd BWA_Indn24_1
+#concatenate files in the new folder
+cat ~/at_RNAseq/150116/Sample_Indn24_Rep1/trimmomatic_Indn24_1/Indn24_1_1P  ~/at_RNAseq/150330/Sample_Indn24_Rep1/Trimmomatic_2Indn24_1/2Indn24_1_1P >3Indn24_1_1P
+cat ~/at_RNAseq/150116/Sample_Indn24_Rep1/trimmomatic_Indn24_1/Indn24_1_2P  ~/at_RNAseq/150330/Sample_Indn24_Rep1/Trimmomatic_2Indn24_1/2Indn24_1_2P >3Indn24_1_2P
+cat ~/at_RNAseq/150116/Sample_Indn24_Rep1/trimmomatic_Indn24_1/Indn24_1_1U  ~/at_RNAseq/150330/Sample_Indn24_Rep1/Trimmomatic_2Indn24_1/2Indn24_1_1U >3Indn24_1_1U
+cat ~/at_RNAseq/150116/Sample_Indn24_Rep1/trimmomatic_Indn24_1/Indn24_1_2U  ~/at_RNAseq/150330/Sample_Indn24_Rep1/Trimmomatic_2Indn24_1/2Indn24_1_2U >3Indn24_1_2U
+
+#### Have to do all files separately... 
+bwa aln -t 4 ../mODC_idx 3Indn24_1_1P >  Indn24_1_1P.txt.bwa
+bwa aln -t 4 ../mODC_idx 3Indn24_1_2P >  Indn24_1_2P.txt.bwa
+bwa sampe ../mODC_idx Indn24_1_1P.txt.bwa Indn24_1_2P.txt.bwa 3Indn24_1_1P 3Indn24_1_2P > Indn24_1_P.txt.sam
+bwa aln -t 4 ../mODC_idx 3Indn24_1_1U >  Indn24_1_1U.txt.bwa
+bwa samse ../mODC_idx Indn24_1_1U.txt.bwa 3Indn24_1_1U > Indn24_1_1U.txt.sam
+bwa aln -t 4 ../mODC_idx 3Indn24_1_2U >  Indn24_1_2U.txt.bwa
+bwa samse ../mODC_idx Indn24_1_2U.txt.bwa 3Indn24_1_2U > Indn24_1_2U.txt.sam
+rm *txt.bwa
+cd ..
+##########################################Indn24_2
+mkdir BWA_Indn24_2  
+cd BWA_Indn24_2
+#concatenate files in the new folder
+cat ~/at_RNAseq/150116/Sample_Indn24_Rep2/trimmomatic_Indn24_2/Indn24_2_1P  ~/at_RNAseq/150330/Sample_Indn24_Rep2/Trimmomatic_2Indn24_2/2Indn24_2_1P >3Indn24_2_1P
+cat ~/at_RNAseq/150116/Sample_Indn24_Rep2/trimmomatic_Indn24_2/Indn24_2_2P  ~/at_RNAseq/150330/Sample_Indn24_Rep2/Trimmomatic_2Indn24_2/2Indn24_2_2P >3Indn24_2_2P
+cat ~/at_RNAseq/150116/Sample_Indn24_Rep2/trimmomatic_Indn24_2/Indn24_2_1U  ~/at_RNAseq/150330/Sample_Indn24_Rep2/Trimmomatic_2Indn24_2/2Indn24_2_1U >3Indn24_2_1U
+cat ~/at_RNAseq/150116/Sample_Indn24_Rep2/trimmomatic_Indn24_2/Indn24_2_2U  ~/at_RNAseq/150330/Sample_Indn24_Rep2/Trimmomatic_2Indn24_2/2Indn24_2_2U >3Indn24_2_2U
+
+#### Have to do all files separately... 
+bwa aln -t 4 ../mODC_idx 3Indn24_2_1P >  Indn24_2_1P.txt.bwa
+bwa aln -t 4 ../mODC_idx 3Indn24_2_2P >  Indn24_2_2P.txt.bwa
+bwa sampe ../mODC_idx Indn24_2_1P.txt.bwa Indn24_2_2P.txt.bwa 3Indn24_2_1P 3Indn24_2_2P > Indn24_2_P.txt.sam
+bwa aln -t 4 ../mODC_idx 3Indn24_2_1U >  Indn24_2_1U.txt.bwa
+bwa samse ../mODC_idx Indn24_2_1U.txt.bwa 3Indn24_2_1U > Indn24_2_1U.txt.sam
+bwa aln -t 4 ../mODC_idx 3Indn24_2_2U >  Indn24_2_2U.txt.bwa
+bwa samse ../mODC_idx Indn24_2_2U.txt.bwa 3Indn24_2_2U > Indn24_2_2U.txt.sam
+rm *txt.bwa
+cd ..
+##########################################Indn24_3
+mkdir BWA_Indn24_3  
+cd BWA_Indn24_3
+#concatenate files in the new folder
+cat ~/at_RNAseq/150116/Sample_Indn24_Rep3/trimmomatic_Indn24_3/Indn24_3_1P  ~/at_RNAseq/150330/Sample_Indn24_Rep3/Trimmomatic_2Indn24_3/2Indn24_3_1P >3Indn24_3_1P
+cat ~/at_RNAseq/150116/Sample_Indn24_Rep3/trimmomatic_Indn24_3/Indn24_3_2P  ~/at_RNAseq/150330/Sample_Indn24_Rep3/Trimmomatic_2Indn24_3/2Indn24_3_2P >3Indn24_3_2P
+cat ~/at_RNAseq/150116/Sample_Indn24_Rep3/trimmomatic_Indn24_3/Indn24_3_1U  ~/at_RNAseq/150330/Sample_Indn24_Rep3/Trimmomatic_2Indn24_3/2Indn24_3_1U >3Indn24_3_1U
+cat ~/at_RNAseq/150116/Sample_Indn24_Rep3/trimmomatic_Indn24_3/Indn24_3_2U  ~/at_RNAseq/150330/Sample_Indn24_Rep3/Trimmomatic_2Indn24_3/2Indn24_3_2U >3Indn24_3_2U
+
+#### Have to do all files separately... 
+bwa aln -t 4 ../mODC_idx 3Indn24_3_1P >  Indn24_3_1P.txt.bwa
+bwa aln -t 4 ../mODC_idx 3Indn24_3_2P >  Indn24_3_2P.txt.bwa
+bwa sampe ../mODC_idx Indn24_3_1P.txt.bwa Indn24_3_2P.txt.bwa 3Indn24_3_1P 3Indn24_3_2P > Indn24_3_P.txt.sam
+bwa aln -t 4 ../mODC_idx 3Indn24_3_1U >  Indn24_3_1U.txt.bwa
+bwa samse ../mODC_idx Indn24_3_1U.txt.bwa 3Indn24_3_1U > Indn24_3_1U.txt.sam
+bwa aln -t 4 ../mODC_idx 3Indn24_3_2U >  Indn24_3_2U.txt.bwa
+bwa samse ../mODC_idx Indn24_3_2U.txt.bwa 3Indn24_3_2U > Indn24_3_2U.txt.sam
+rm *txt.bwa
+cd ..
+##########################################Indn48_1
+mkdir BWA_Indn48_1  
+cd BWA_Indn48_1
+#concatenate files in the new folder
+cat ~/at_RNAseq/150116/Sample_Indn48_Rep1/trimmomatic_Indn48_1/Indn48_1_1P  ~/at_RNAseq/150330/Sample_Indn48_Rep1/Trimmomatic_2Indn48_1/2Indn48_1_1P >3Indn48_1_1P
+cat ~/at_RNAseq/150116/Sample_Indn48_Rep1/trimmomatic_Indn48_1/Indn48_1_2P  ~/at_RNAseq/150330/Sample_Indn48_Rep1/Trimmomatic_2Indn48_1/2Indn48_1_2P >3Indn48_1_2P
+cat ~/at_RNAseq/150116/Sample_Indn48_Rep1/trimmomatic_Indn48_1/Indn48_1_1U  ~/at_RNAseq/150330/Sample_Indn48_Rep1/Trimmomatic_2Indn48_1/2Indn48_1_1U >3Indn48_1_1U
+cat ~/at_RNAseq/150116/Sample_Indn48_Rep1/trimmomatic_Indn48_1/Indn48_1_2U  ~/at_RNAseq/150330/Sample_Indn48_Rep1/Trimmomatic_2Indn48_1/2Indn48_1_2U >3Indn48_1_2U
+
+#### Have to do all files separately... 
+bwa aln -t 4 ../mODC_idx 3Indn48_1_1P >  Indn48_1_1P.txt.bwa
+bwa aln -t 4 ../mODC_idx 3Indn48_1_2P >  Indn48_1_2P.txt.bwa
+bwa sampe ../mODC_idx Indn48_1_1P.txt.bwa Indn48_1_2P.txt.bwa 3Indn48_1_1P 3Indn48_1_2P > Indn48_1_P.txt.sam
+bwa aln -t 4 ../mODC_idx 3Indn48_1_1U >  Indn48_1_1U.txt.bwa
+bwa samse ../mODC_idx Indn48_1_1U.txt.bwa 3Indn48_1_1U > Indn48_1_1U.txt.sam
+bwa aln -t 4 ../mODC_idx 3Indn48_1_2U >  Indn48_1_2U.txt.bwa
+bwa samse ../mODC_idx Indn48_1_2U.txt.bwa 3Indn48_1_2U > Indn48_1_2U.txt.sam
+rm *txt.bwa
+cd ..
+##########################################Indn48_2
+mkdir BWA_Indn48_2  
+cd BWA_Indn48_2
+#concatenate files in the new folder
+cat ~/at_RNAseq/150116/Sample_Indn48_Rep2/trimmomatic_Indn48_2/Indn48_2_1P  ~/at_RNAseq/150330/Sample_Indn48_Rep2/Trimmomatic_2Indn48_2/2Indn48_2_1P >3Indn48_2_1P
+cat ~/at_RNAseq/150116/Sample_Indn48_Rep2/trimmomatic_Indn48_2/Indn48_2_2P  ~/at_RNAseq/150330/Sample_Indn48_Rep2/Trimmomatic_2Indn48_2/2Indn48_2_2P >3Indn48_2_2P
+cat ~/at_RNAseq/150116/Sample_Indn48_Rep2/trimmomatic_Indn48_2/Indn48_2_1U  ~/at_RNAseq/150330/Sample_Indn48_Rep2/Trimmomatic_2Indn48_2/2Indn48_2_1U >3Indn48_2_1U
+cat ~/at_RNAseq/150116/Sample_Indn48_Rep2/trimmomatic_Indn48_2/Indn48_2_2U  ~/at_RNAseq/150330/Sample_Indn48_Rep2/Trimmomatic_2Indn48_2/2Indn48_2_2U >3Indn48_2_2U
+
+#### Have to do all files separately... 
+bwa aln -t 4 ../mODC_idx 3Indn48_2_1P >  Indn48_2_1P.txt.bwa
+bwa aln -t 4 ../mODC_idx 3Indn48_2_2P >  Indn48_2_2P.txt.bwa
+bwa sampe ../mODC_idx Indn48_2_1P.txt.bwa Indn48_2_2P.txt.bwa 3Indn48_2_1P 3Indn48_2_2P > Indn48_2_P.txt.sam
+bwa aln -t 4 ../mODC_idx 3Indn48_2_1U >  Indn48_2_1U.txt.bwa
+bwa samse ../mODC_idx Indn48_2_1U.txt.bwa 3Indn48_2_1U > Indn48_2_1U.txt.sam
+bwa aln -t 4 ../mODC_idx 3Indn48_2_2U >  Indn48_2_2U.txt.bwa
+bwa samse ../mODC_idx Indn48_2_2U.txt.bwa 3Indn48_2_2U > Indn48_2_2U.txt.sam
+rm *txt.bwa
+cd ..
+##########################################Indn48_3
+mkdir BWA_Indn48_3  
+cd BWA_Indn48_3
+#concatenate files in the new folder
+cat ~/at_RNAseq/150116/Sample_Indn48_Rep3/trimmomatic_Indn48_3/Indn48_3_1P  ~/at_RNAseq/150330/Sample_Indn48_Rep3/Trimmomatic_2Indn48_3/2Indn48_3_1P >3Indn48_3_1P
+cat ~/at_RNAseq/150116/Sample_Indn48_Rep3/trimmomatic_Indn48_3/Indn48_3_2P  ~/at_RNAseq/150330/Sample_Indn48_Rep3/Trimmomatic_2Indn48_3/2Indn48_3_2P >3Indn48_3_2P
+cat ~/at_RNAseq/150116/Sample_Indn48_Rep3/trimmomatic_Indn48_3/Indn48_3_1U  ~/at_RNAseq/150330/Sample_Indn48_Rep3/Trimmomatic_2Indn48_3/2Indn48_3_1U >3Indn48_3_1U
+cat ~/at_RNAseq/150116/Sample_Indn48_Rep3/trimmomatic_Indn48_3/Indn48_3_2U  ~/at_RNAseq/150330/Sample_Indn48_Rep3/Trimmomatic_2Indn48_3/2Indn48_3_2U >3Indn48_3_2U
+
+#### Have to do all files separately... 
+bwa aln -t 4 ../mODC_idx 3Indn48_3_1P >  Indn48_3_1P.txt.bwa
+bwa aln -t 4 ../mODC_idx 3Indn48_3_2P >  Indn48_3_2P.txt.bwa
+bwa sampe ../mODC_idx Indn48_3_1P.txt.bwa Indn48_3_2P.txt.bwa 3Indn48_3_1P 3Indn48_3_2P > Indn48_3_P.txt.sam
+bwa aln -t 4 ../mODC_idx 3Indn48_3_1U >  Indn48_3_1U.txt.bwa
+bwa samse ../mODC_idx Indn48_3_1U.txt.bwa 3Indn48_3_1U > Indn48_3_1U.txt.sam
+bwa aln -t 4 ../mODC_idx 3Indn48_3_2U >  Indn48_3_2U.txt.bwa
+bwa samse ../mODC_idx Indn48_3_2U.txt.bwa 3Indn48_3_2U > Indn48_3_2U.txt.sam
+rm *txt.bwa
+cd ..
+
+##########################################Wt0_1
+mkdir BWA_Wt0_1  
+cd BWA_Wt0_1
+#concatenate files in the new folder
+cat ~/at_RNAseq/150116/Sample_Wt0_Rep1/trimmomatic_Wt0_1/Wt0_1_1P  ~/at_RNAseq/150330/Sample_Wt0_Rep1/Trimmomatic_2Wt0_1/2Wt0_1_1P >3Wt0_1_1P
+cat ~/at_RNAseq/150116/Sample_Wt0_Rep1/trimmomatic_Wt0_1/Wt0_1_2P  ~/at_RNAseq/150330/Sample_Wt0_Rep1/Trimmomatic_2Wt0_1/2Wt0_1_2P >3Wt0_1_2P
+cat ~/at_RNAseq/150116/Sample_Wt0_Rep1/trimmomatic_Wt0_1/Wt0_1_1U  ~/at_RNAseq/150330/Sample_Wt0_Rep1/Trimmomatic_2Wt0_1/2Wt0_1_1U >3Wt0_1_1U
+cat ~/at_RNAseq/150116/Sample_Wt0_Rep1/trimmomatic_Wt0_1/Wt0_1_2U  ~/at_RNAseq/150330/Sample_Wt0_Rep1/Trimmomatic_2Wt0_1/2Wt0_1_2U >3Wt0_1_2U
+
+#### Have to do all files separately... 
+bwa aln -t 4 ../mODC_idx 3Wt0_1_1P >  Wt0_1_1P.txt.bwa
+bwa aln -t 4 ../mODC_idx 3Wt0_1_2P >  Wt0_1_2P.txt.bwa
+bwa sampe ../mODC_idx Wt0_1_1P.txt.bwa Wt0_1_2P.txt.bwa 3Wt0_1_1P 3Wt0_1_2P > Wt0_1_P.txt.sam
+bwa aln -t 4 ../mODC_idx 3Wt0_1_1U >  Wt0_1_1U.txt.bwa
+bwa samse ../mODC_idx Wt0_1_1U.txt.bwa 3Wt0_1_1U > Wt0_1_1U.txt.sam
+bwa aln -t 4 ../mODC_idx 3Wt0_1_2U >  Wt0_1_2U.txt.bwa
+bwa samse ../mODC_idx Wt0_1_2U.txt.bwa 3Wt0_1_2U > Wt0_1_2U.txt.sam
+rm *txt.bwa
+cd ..
+##########################################Wt0_2
+mkdir BWA_Wt0_2  
+cd BWA_Wt0_2
+#concatenate files in the new folder
+cat ~/at_RNAseq/150116/Sample_Wt0_Rep2/trimmomatic_Wt0_2/Wt0_2_1P  ~/at_RNAseq/150330/Sample_Wt0_Rep2/Trimmomatic_2Wt0_2/2Wt0_2_1P >3Wt0_2_1P
+cat ~/at_RNAseq/150116/Sample_Wt0_Rep2/trimmomatic_Wt0_2/Wt0_2_2P  ~/at_RNAseq/150330/Sample_Wt0_Rep2/Trimmomatic_2Wt0_2/2Wt0_2_2P >3Wt0_2_2P
+cat ~/at_RNAseq/150116/Sample_Wt0_Rep2/trimmomatic_Wt0_2/Wt0_2_1U  ~/at_RNAseq/150330/Sample_Wt0_Rep2/Trimmomatic_2Wt0_2/2Wt0_2_1U >3Wt0_2_1U
+cat ~/at_RNAseq/150116/Sample_Wt0_Rep2/trimmomatic_Wt0_2/Wt0_2_2U  ~/at_RNAseq/150330/Sample_Wt0_Rep2/Trimmomatic_2Wt0_2/2Wt0_2_2U >3Wt0_2_2U
+
+#### Have to do all files separately... 
+bwa aln -t 4 ../mODC_idx 3Wt0_2_1P >  Wt0_2_1P.txt.bwa
+bwa aln -t 4 ../mODC_idx 3Wt0_2_2P >  Wt0_2_2P.txt.bwa
+bwa sampe ../mODC_idx Wt0_2_1P.txt.bwa Wt0_2_2P.txt.bwa 3Wt0_2_1P 3Wt0_2_2P > Wt0_2_P.txt.sam
+bwa aln -t 4 ../mODC_idx 3Wt0_2_1U >  Wt0_2_1U.txt.bwa
+bwa samse ../mODC_idx Wt0_2_1U.txt.bwa 3Wt0_2_1U > Wt0_2_1U.txt.sam
+bwa aln -t 4 ../mODC_idx 3Wt0_2_2U >  Wt0_2_2U.txt.bwa
+bwa samse ../mODC_idx Wt0_2_2U.txt.bwa 3Wt0_2_2U > Wt0_2_2U.txt.sam
+rm *txt.bwa
+cd ..
+##########################################Wt0_3
+mkdir BWA_Wt0_3  
+cd BWA_Wt0_3
+#concatenate files in the new folder
+cat ~/at_RNAseq/150116/Sample_Wt0_Rep3/trimmomatic_Wt0_3/Wt0_3_1P  ~/at_RNAseq/150330/Sample_Wt0_Rep3/Trimmomatic_2Wt0_3/2Wt0_3_1P >3Wt0_3_1P
+cat ~/at_RNAseq/150116/Sample_Wt0_Rep3/trimmomatic_Wt0_3/Wt0_3_2P  ~/at_RNAseq/150330/Sample_Wt0_Rep3/Trimmomatic_2Wt0_3/2Wt0_3_2P >3Wt0_3_2P
+cat ~/at_RNAseq/150116/Sample_Wt0_Rep3/trimmomatic_Wt0_3/Wt0_3_1U  ~/at_RNAseq/150330/Sample_Wt0_Rep3/Trimmomatic_2Wt0_3/2Wt0_3_1U >3Wt0_3_1U
+cat ~/at_RNAseq/150116/Sample_Wt0_Rep3/trimmomatic_Wt0_3/Wt0_3_2U  ~/at_RNAseq/150330/Sample_Wt0_Rep3/Trimmomatic_2Wt0_3/2Wt0_3_2U >3Wt0_3_2U
+
+#### Have to do all files separately... 
+bwa aln -t 4 ../mODC_idx 3Wt0_3_1P >  Wt0_3_1P.txt.bwa
+bwa aln -t 4 ../mODC_idx 3Wt0_3_2P >  Wt0_3_2P.txt.bwa
+bwa sampe ../mODC_idx Wt0_3_1P.txt.bwa Wt0_3_2P.txt.bwa 3Wt0_3_1P 3Wt0_3_2P > Wt0_3_P.txt.sam
+bwa aln -t 4 ../mODC_idx 3Wt0_3_1U >  Wt0_3_1U.txt.bwa
+bwa samse ../mODC_idx Wt0_3_1U.txt.bwa 3Wt0_3_1U > Wt0_3_1U.txt.sam
+bwa aln -t 4 ../mODC_idx 3Wt0_3_2U >  Wt0_3_2U.txt.bwa
+bwa samse ../mODC_idx Wt0_3_2U.txt.bwa 3Wt0_3_2U > Wt0_3_2U.txt.sam
+rm *txt.bwa
+cd ..
+
+#####**********############*************###########**********###########**************###########**********##########**********##########******
+samtools view -bS Cnst0_1_P.txt.sam | samtools sort -m 30000000000 - Cnst0_1_P.srt.bam
+samtools view -bS Cnst0_1_1U.txt.sam | samtools sort -m 30000000000 - Cnst0_1_1U.srt.bam
+samtools view -bS Cnst0_1_2U.txt.sam | samtools sort -m 30000000000 - Cnst0_1_2U.srt.bam
+samtools merge Cnst0_1_bwa.srt.bam *.srt.bam	##DONE
+
+samtools view -bS Cnst0_2_P.txt.sam | samtools sort -m 30000000000 - Cnst0_2_P.srt.bam
+samtools view -bS Cnst0_2_1U.txt.sam | samtools sort -m 30000000000 - Cnst0_2_1U.srt.bam
+samtools view -bS Cnst0_2_2U.txt.sam | samtools sort -m 30000000000 - Cnst0_2_2U.srt.bam
+samtools merge Cnst0_2_bwa.srt.bam *.srt.bam	##DONE
+
+samtools view -bS Cnst0_3_P.txt.sam | samtools sort -m 30000000000 - Cnst0_3_P.srt
+samtools view -bS Cnst0_3_1U.txt.sam | samtools sort -m 30000000000 - Cnst0_3_1U.srt
+samtools view -bS Cnst0_3_2U.txt.sam | samtools sort -m 30000000000 - Cnst0_3_2U.srt
+samtools merge Cnst0_3_bwa.srt.bam *.srt.bam  ##DONE
+
+samtools view -bS Cnst24_1_P.txt.sam | samtools sort -m 30000000000 - Cnst24_1_P.srt
+samtools view -bS Cnst24_1_1U.txt.sam | samtools sort -m 30000000000 - Cnst24_1_1U.srt
+samtools view -bS Cnst24_1_2U.txt.sam | samtools sort -m 30000000000 - Cnst24_1_2U.srt
+samtools merge Cnst24_1_bwa.srt.bam *.srt.bam	##DONE
+
+samtools view -bS Cnst24_2_P.txt.sam | samtools sort -m 30000000000 - Cnst24_2_P.srt
+samtools view -bS Cnst24_2_1U.txt.sam | samtools sort -m 30000000000 - Cnst24_2_1U.srt
+samtools view -bS Cnst24_2_2U.txt.sam | samtools sort -m 30000000000 - Cnst24_2_2U.srt
+samtools merge Cnst24_2_bwa.srt.bam *.srt.bam
+
+samtools view -bS Cnst24_3_P.txt.sam | samtools sort -m 30000000000 - Cnst24_3_P.srt
+samtools view -bS Cnst24_3_1U.txt.sam | samtools sort -m 30000000000 - Cnst24_3_1U.srt
+samtools view -bS Cnst24_3_2U.txt.sam | samtools sort -m 30000000000 - Cnst24_3_2U.srt
+samtools merge Cnst24_3_bwa.srt.bam *.srt.bam
+
+samtools view -bS Ind0_1_P.txt.sam | samtools sort -m 30000000000 - Ind0_1_P.srt
+samtools view -bS Ind0_1_1U.txt.sam | samtools sort -m 30000000000 - Ind0_1_1U.srt
+samtools view -bS Ind0_1_2U.txt.sam | samtools sort -m 30000000000 - Ind0_1_2U.srt
+samtools merge Ind0_1_bwa.srt.bam *.srt.bam
+
+samtools view -bS Ind0_2_P.txt.sam | samtools sort -m 30000000000 - Ind0_2_P.srt
+samtools view -bS Ind0_2_1U.txt.sam | samtools sort -m 30000000000 - Ind0_2_1U.srt
+samtools view -bS Ind0_2_2U.txt.sam | samtools sort -m 30000000000 - Ind0_2_2U.srt
+samtools merge Ind0_2_bwa.srt.bam *.srt.bam
+
+samtools view -bS Ind0_3_P.txt.sam | samtools sort -m 30000000000 - Ind0_3_P.srt
+samtools view -bS Ind0_3_1U.txt.sam | samtools sort -m 30000000000 - Ind0_3_1U.srt
+samtools view -bS Ind0_3_2U.txt.sam | samtools sort -m 30000000000 - Ind0_3_2U.srt
+samtools merge Ind0_3_bwa.srt.bam *.srt.bam
+
+samtools view -bS Indi24_1_P.txt.sam | samtools sort -m 30000000000 - Indi24_1_P.srt
+samtools view -bS Indi24_1_1U.txt.sam | samtools sort -m 30000000000 - Indi24_1_1U.srt
+samtools view -bS Indi24_1_2U.txt.sam | samtools sort -m 30000000000 - Indi24_1_2U.srt
+samtools merge Indi24_1_bwa.srt.bam *.srt.bam
+
+samtools view -bS Indi24_2_P.txt.sam | samtools sort -m 30000000000 - Indi24_2_P.srt
+samtools view -bS Indi24_2_1U.txt.sam | samtools sort -m 30000000000 - Indi24_2_1U.srt
+samtools view -bS Indi24_2_2U.txt.sam | samtools sort -m 30000000000 - Indi24_2_2U.srt
+samtools merge Indi24_2_bwa.srt.bam *.srt.bam
+
+samtools view -bS Indi24_3_P.txt.sam | samtools sort -m 30000000000 - Indi24_3_P.srt
+samtools view -bS Indi24_3_1U.txt.sam | samtools sort -m 30000000000 - Indi24_3_1U.srt
+samtools view -bS Indi24_3_2U.txt.sam | samtools sort -m 30000000000 - Indi24_3_2U.srt
+samtools merge Indi24_3_bwa.srt.bam *.srt.bam
+
+samtools view -bS Indi48_1_P.txt.sam | samtools sort -m 30000000000 - Indi48_1_P.srt
+samtools view -bS Indi48_1_1U.txt.sam | samtools sort -m 30000000000 - Indi48_1_1U.srt
+samtools view -bS Indi48_1_2U.txt.sam | samtools sort -m 30000000000 - Indi48_1_2U.srt
+samtools merge Indi48_1_bwa.srt.bam *.srt.bam
+
+samtools view -bS Indi48_2_P.txt.sam | samtools sort -m 30000000000 - Indi48_2_P.srt
+samtools view -bS Indi48_2_1U.txt.sam | samtools sort -m 30000000000 - Indi48_2_1U.srt
+samtools view -bS Indi48_2_2U.txt.sam | samtools sort -m 30000000000 - Indi48_2_2U.srt
+samtools merge Indi48_2_bwa.srt.bam *.srt.bam
+cd ../BWA_Indi48_3
+samtools view -bS Indi48_3_P.txt.sam | samtools sort -m 30000000000 - Indi48_3_P.srt
+samtools view -bS Indi48_3_1U.txt.sam | samtools sort -m 30000000000 - Indi48_3_1U.srt
+samtools view -bS Indi48_3_2U.txt.sam | samtools sort -m 30000000000 - Indi48_3_2U.srt
+samtools merge Indi48_3_bwa.srt.bam *.srt.bam
+cd ../BWA_Indn24_1
+samtools view -bS Indn24_1_P.txt.sam | samtools sort -m 30000000000 - Indn24_1_P.srt
+samtools view -bS Indn24_1_1U.txt.sam | samtools sort -m 30000000000 - Indn24_1_1U.srt
+samtools view -bS Indn24_1_2U.txt.sam | samtools sort -m 30000000000 - Indn24_1_2U.srt
+samtools merge Indn24_1_bwa.srt.bam *.srt.bam
+cd ../BWA_Indn24_2
+samtools view -bS Indn24_2_P.txt.sam | samtools sort -m 30000000000 - Indn24_2_P.srt
+samtools view -bS Indn24_2_1U.txt.sam | samtools sort -m 30000000000 - Indn24_2_1U.srt
+samtools view -bS Indn24_2_2U.txt.sam | samtools sort -m 30000000000 - Indn24_2_2U.srt
+samtools merge Indn24_2_bwa.srt.bam *.srt.bam
+cd ../BWA_Indn24_3
+samtools view -bS Indn24_3_P.txt.sam | samtools sort -m 30000000000 - Indn24_3_P.srt
+samtools view -bS Indn24_3_1U.txt.sam | samtools sort -m 30000000000 - Indn24_3_1U.srt
+samtools view -bS Indn24_3_2U.txt.sam | samtools sort -m 30000000000 - Indn24_3_2U.srt
+samtools merge Indn24_3_bwa.srt.bam *.srt.bam
+cd ../BWA_Indn48_1
+samtools view -bS Indn48_1_P.txt.sam | samtools sort -m 30000000000 - Indn48_1_P.srt
+samtools view -bS Indn48_1_1U.txt.sam | samtools sort -m 30000000000 - Indn48_1_1U.srt
+samtools view -bS Indn48_1_2U.txt.sam | samtools sort -m 30000000000 - Indn48_1_2U.srt
+samtools merge Indn48_1_bwa.srt.bam *.srt.bam
+cd ../BWA_Indn48_2
+samtools view -bS Indn48_2_P.txt.sam | samtools sort -m 30000000000 - Indn48_2_P.srt
+samtools view -bS Indn48_2_1U.txt.sam | samtools sort -m 30000000000 - Indn48_2_1U.srt
+samtools view -bS Indn48_2_2U.txt.sam | samtools sort -m 30000000000 - Indn48_2_2U.srt
+samtools merge Indn48_2_bwa.srt.bam *.srt.bam
+cd ../BWA_Indn48_3
+samtools view -bS Indn48_3_P.txt.sam | samtools sort -m 30000000000 - Indn48_3_P.srt
+samtools view -bS Indn48_3_1U.txt.sam | samtools sort -m 30000000000 - Indn48_3_1U.srt
+samtools view -bS Indn48_3_2U.txt.sam | samtools sort -m 30000000000 - Indn48_3_2U.srt
+samtools merge Indn48_3_bwa.srt.bam *.srt.bam
+cd ../BWA_Wt0_1
+samtools view -bS Wt0_1_P.txt.sam | samtools sort -m 30000000000 - Wt0_1_P.srt
+samtools view -bS Wt0_1_1U.txt.sam | samtools sort -m 30000000000 - Wt0_1_1U.srt
+samtools view -bS Wt0_1_2U.txt.sam | samtools sort -m 30000000000 - Wt0_1_2U.srt
+samtools merge Wt0_1_bwa.srt.bam *.srt.bam
+cd ../BWA_Wt0_2
+samtools view -bS Wt0_2_P.txt.sam | samtools sort -m 30000000000 - Wt0_2_P.srt
+samtools view -bS Wt0_2_1U.txt.sam | samtools sort -m 30000000000 - Wt0_2_1U.srt
+samtools view -bS Wt0_2_2U.txt.sam | samtools sort -m 30000000000 - Wt0_2_2U.srt
+samtools merge Wt0_2_bwa.srt.bam *.srt.bam
+cd ../BWA_Wt0_3
+samtools view -bS Wt0_3_P.txt.sam | samtools sort -m 30000000000 - Wt0_3_P.srt
+samtools view -bS Wt0_3_1U.txt.sam | samtools sort -m 30000000000 - Wt0_3_1U.srt
+samtools view -bS Wt0_3_2U.txt.sam | samtools sort -m 30000000000 - Wt0_3_2U.srt
+samtools merge Wt0_3_bwa.srt.bam *.srt.bam
+
+
+####move all of the merged, sorted bam files to my desktop so I could analyze with Rstudio. 
+scp -p -r -C -P 22 name@serverAddress:~/at_RNAseq/BWA_mODC/BWA_*/*_bwa.srt.bam /RNA_seq/Analysis/mODC_expression
