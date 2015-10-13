@@ -1,0 +1,60 @@
+### To Download Reads from Server
+### Trim For Quality with Trimmomatic
+### Visualize Quality with FastQC and Jellyfish
+
+
+# From home server (login with ssh), download from sequencing server
+scp -p -r -C -P 22 name@seq.server.address:~/job# ~/at_RNAseq
+	# 150116 for the first set of sequencing reads, #150330 for second set of sequencing reads
+	
+# For each sample, merge the R1 reads into a single file and rename.
+# Merge R3 reads into a single file and rename as R2
+# Delete the initial R2 files 
+#(final result run 1: Cnst0_1_R1.fastq and Cnst0_1_R1.fastq; run 2: 2Cnst0_1_R1.fastq and 2Cnst0_1_R1.fastq)
+	cat Cnst0_Rep1_TGACCAAT_L001_R1_001.fastq.gz Cnst0_Rep1_TGACCAAT_L001_R1_002.fastq.gz > Cnst0_1_R1.fastq.gz
+	cat Cnst0_Rep1_TGACCAAT_L001_R1_001.fastq.gz Cnst0_Rep1_TGACCAAT_L001_R1_002.fastq.gz > 2Cnst0_1_R1.fastq.gz
+
+	cat Cnst0_Rep1_TGACCAAT_L001_R3_001.fastq.gz Cnst0_Rep1_TGACCAAT_L001_R3_002.fastq.gz > Cnst0_1_R2.fastq.gz
+	cat Cnst0_Rep1_TGACCAAT_L001_R3_001.fastq.gz Cnst0_Rep1_TGACCAAT_L001_R3_002.fastq.gz > 2Cnst0_1_R2.fastq.gz
+
+	rm  *_R2_00*.fastq.gz
+
+# Run Trimmomatic to Trim poor quality sequences 
+# make a Trimmomatic directory for each sample within its initial read directory. 
+# Run command from within this directory
+	mkdir Trimmomatic_2Cnst0_1
+	
+	java -Xmx10g -jar /home/sarver/at_RNAseq/Trimmomatic-0.32/trimmomatic-0.32.jar PE \
+	-threads 4 -baseout 2Cnst0_1 \
+	../2Cnst0_1_R1.fastq.gz \
+	../2Cnst0_1_R2.fastq.gz \
+	ILLUMINACLIP:/home/sarver/at_RNAseq/matt_adapters.fasta:2:30:10 \
+	SLIDINGWINDOW:4:5 \
+	LEADING:5 \
+	TRAILING:5 \
+	MINLEN:25
+	
+# Further Analyze Quality by running Fastqc on the Trimmomatic output files
+
+	cd /Sample_Cnst0_Rep1
+	fastqc -t 4 Trimmomatic_2Cnst0_1/2Cnst0_1_1P
+	fastqc -t 4 Trimmomatic_2Cnst0_1/2Cnst0_1_1U
+	fastqc -t 4 Trimmomatic_2Cnst0_1/2Cnst0_1_2P
+	fastqc -t 4 Trimmomatic_2Cnst0_1/2Cnst0_1_2U
+
+# Can also make histogram visuals in Jellyfish
+
+	mkdir /Sample_Cnst0_Rep1/jelly_2Cnst0_1
+	cd jelly_2Cnst0_1
+	jellyfish count -m 25 -s 200M -t 4 -C -o 2Cnst0_1_1P.jf ../Trimmomatic_2Cnst0_1/2Cnst0_1_1P 
+	jellyfish histo 2Cnst0_1_1P.jf -o 2Cnst0_1_1P.histo
+	jellyfish count -m 25 -s 200M -t 4 -C -o 2Cnst0_1_1U.jf ../Trimmomatic_2Cnst0_1/2Cnst0_1_1U 
+	jellyfish histo 2Cnst0_1_1U.jf -o 2Cnst0_1_1U.histo
+	jellyfish count -m 25 -s 200M -t 4 -C -o 2Cnst0_1_2P.jf ../Trimmomatic_2Cnst0_1/2Cnst0_1_2P 
+	jellyfish histo 2Cnst0_1_2P.jf -o 2Cnst0_1_2P.histo
+	jellyfish count -m 25 -s 200M -t 4 -C -o 2Cnst0_1_2U.jf ../Trimmomatic_2Cnst0_1/2Cnst0_1_2U 
+	jellyfish histo 2Cnst0_1_2U.jf -o 2Cnst0_1_2U.histo
+	
+	
+# continue for all samples
+# merge 
